@@ -2,6 +2,41 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Introduction
+The project required to create a program that would navigate a car safely through the simulated highway environment. 
+
+The telemetry data provided by the simulator to the program would include an error measured as a deviation from the optimal trajectory and the program would use the error and the PID controller to adjust car’s steering to minimize the error and thus guide a car as close as possible to the optimal trajectory.
+
+## Implementation and Tuning
+The implementation of the PID controller is quite simple and it involves returning a desired <steer_value> based on the current error obtained from the simulator and calculated adjustments based on the current error, the previous error and the accumulated error. 
+
+The difficult part is to find the coefficients for the adjustments that would allow the error to converge to its minimum and stay there for the duration of the simulated drive. To find the coefficients the TWIDDLE algorithm was used.
+
+Given that without proper steering the car just drives off the highway it was difficult to use the TWIDDLE right away. There was no time for it to properly find the right coefficients. A lot of tuning was done by tweaking the initial P, D, I coefficients manually.  From my personal runs it was evident that the coefficient for the error difference term D should be larger than the one for the current error term P. The only way I was able to make TWIDDLE to converge and come up with a result that would keep a car on a highway for a full circle was to make the dp[P] parameter for the P term to start from the number  much smaller than 1 while starting the dp[D] parameter for the D term from 1.  The I term did not make much difference and it is logical assuming the simulator has no inherent bias/drift.  
+The coefficients found by TWIDDLE were then used to run a car and it stayed on a highway for a full cycle.
+
+## Performance
+Though the car stays on a highway for a full cycle the performance is very jerky. It constantly overshoots the optimal trajectory and then tries to come back. 
+
+## Reflection
+Given how near-perfect the TWIDDLE-found coefficients performed in a sample with a straight line I am guessing that the simulator telemetry data may be too sparse or the steering is naturally not a real-time adjustment and has a time lag.
+
+Because of the jerky performance I did not try to maximize the car speed as it most likely would make the matters worse. I did attempt to come up with heuristics that would make the car run smoother. For example I tried to do a “progressive” steer calculation where depending on the magnitude of the current CTE I would scale the coefficients of the PID controller. For example:
+
+// progressive PID
+
+    if (fabs(p_error_) < 0.2)
+    	result = 0;
+    else if (fabs(p_error_) < 2) // 70% steer
+    	result = -Kp_ * 0.7 * p_error_ - Kd_ * 0.7 * d_error_ - Ki_ * i_error_;
+    else if (fabs(p_error_) < 5) // 80% steer
+    	result = -Kp_ * 0.8 * p_error_ - Kd_ * 0.8 * d_error_ - Ki_ * i_error_;
+    else if (fabs(p_error_) < 8) // 90% steer
+    	result = -Kp_ * 0.9 * p_error_ - Kd_ * 0.9 * d_error_ - Ki_ * i_error_;
+    else // 100%
+    	result = -Kp_ * 1.0 * p_error_ - Kd_ * 1.0 * d_error_ - Ki_ * i_error_;
+
+But I did not observe any noticeable improvement.
 
 ## Dependencies
 
