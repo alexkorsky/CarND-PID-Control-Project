@@ -10,13 +10,28 @@ The telemetry data provided by the simulator to the program would include an err
 ## Implementation and Tuning
 The implementation of the PID controller is quite simple and it involves returning a desired <steer_value> based on the current error obtained from the simulator and calculated adjustments based on the current error, the previous error and the accumulated error. 
 
+
+**_P_** - Proportional control
+The proportional term computes an adjustment proportional to the cross-track error.  When used by itself it has a tendency to overcorrect and results in large oscillations.
+
+**_D_** - Derivative control
+The oscillations caused by Proportional control can be smoothed out by using a term proportional to the change of the cross-track error. 
+
+**_I_** - integrated control
+To deal with inherent drift (bias) of the system a third term may be used to adjust the next correction in proportion to the total accumulated error so far.
+
+
 The difficult part is to find the coefficients for the adjustments that would allow the error to converge to its minimum and stay there for the duration of the simulated drive. To find the coefficients the TWIDDLE algorithm was used.
 
 Given that without proper steering the car just drives off the highway it was difficult to use the TWIDDLE right away. There was no time for it to properly find the right coefficients. A lot of tuning was done by tweaking the initial P, D, I coefficients manually.  From my personal runs it was evident that the coefficient for the error difference term D should be larger than the one for the current error term P. The only way I was able to make TWIDDLE to converge and come up with a result that would keep a car on a highway for a full circle was to make the dp[P] parameter for the P term to start from the number  much smaller than 1 while starting the dp[D] parameter for the D term from 1.  The I term did not make much difference and it is logical assuming the simulator has no inherent bias/drift.  
 The coefficients found by TWIDDLE were then used to run a car and it stayed on a highway for a full cycle.
 
 ## Performance
-Though the car stays on a highway for a full cycle the performance is very jerky. It constantly overshoots the optimal trajectory and then tries to come back. 
+Though the car stays on a highway for a full cycle the performance is very jerky. It constantly overshoots the optimal trajectory and then tries to come back.
+
+A sort video "./CarND-PID-Control-Short.mp4" is included here
+
+![ alt text ](./Simulator.png "")
 
 ## Reflection
 Given how near-perfect the TWIDDLE-found coefficients performed in a sample with a straight line I am guessing that the simulator telemetry data may be too sparse or the steering is naturally not a real-time adjustment and has a time lag.
