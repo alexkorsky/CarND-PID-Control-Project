@@ -27,7 +27,7 @@ Given that without proper steering the car just drives off the highway it was di
 The coefficients found by TWIDDLE were then used to run a car and it stayed on a highway for a full cycle.
 
 ## Performance
-Though the car stays on a highway for a full cycle the performance is very jerky. It constantly overshoots the optimal trajectory and then tries to come back.
+Though the car stays on a highway for a full cycle the performance is sometimes is jerky. In tricky places it overshoots the optimal trajectory and then tries to come back.
 
 A short video  is included here:
 
