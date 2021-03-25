@@ -29,9 +29,9 @@ The coefficients found by TWIDDLE were then used to run a car and it stayed on a
 ## Performance
 Though the car stays on a highway for a full cycle the performance is very jerky. It constantly overshoots the optimal trajectory and then tries to come back.
 
-A sort video "./CarND-PID-Control-Short.mp4" is included here
+A short video  is included here:
 
-![ alt text ](./Simulator.png "")
+![ alt text ](./Simulator.gif "")
 
 ## Reflection
 Given how near-perfect the TWIDDLE-found coefficients performed in a sample with a straight line I am guessing that the simulator telemetry data may be too sparse or the steering is naturally not a real-time adjustment and has a time lag.
